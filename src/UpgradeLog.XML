@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="NHibernate">
+</Property><Property Name="Solution File" Value="D:\sandbox\NHibernate3\src\NHibernate.sln">
+</Property><Property Name="Date" Value="Tuesday, February 22, 2011">
+</Property><Property Name="Time" Value="13:52 PM">
+</Property></Properties><Event ErrorLevel="0" Project="NHibernate" Source="NHibernate\NHibernate.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate" Source="NHibernate\NHibernate.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.DomainModel" Source="NHibernate.DomainModel\NHibernate.DomainModel.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.DomainModel" Source="NHibernate.DomainModel\NHibernate.DomainModel.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.Test" Source="NHibernate.Test\NHibernate.Test.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.Test" Source="NHibernate.Test\NHibernate.Test.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.LinFu" Source="NHibernate.ByteCode.LinFu\NHibernate.ByteCode.LinFu.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.ByteCode.LinFu" Source="NHibernate.ByteCode.LinFu\NHibernate.ByteCode.LinFu.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.LinFu.Tests" Source="NHibernate.ByteCode.LinFu.Tests\NHibernate.ByteCode.LinFu.Tests.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.ByteCode.LinFu.Tests" Source="NHibernate.ByteCode.LinFu.Tests\NHibernate.ByteCode.LinFu.Tests.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.Castle" Source="NHibernate.ByteCode.Castle\NHibernate.ByteCode.Castle.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.ByteCode.Castle" Source="NHibernate.ByteCode.Castle\NHibernate.ByteCode.Castle.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.Castle.Tests" Source="NHibernate.ByteCode.Castle.Tests\NHibernate.ByteCode.Castle.Tests.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.ByteCode.Castle.Tests" Source="NHibernate.ByteCode.Castle.Tests\NHibernate.ByteCode.Castle.Tests.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.TestDatabaseSetup" Source="NHibernate.TestDatabaseSetup\NHibernate.TestDatabaseSetup.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="NHibernate.TestDatabaseSetup" Source="NHibernate.TestDatabaseSetup\NHibernate.TestDatabaseSetup.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="NHibernate.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="NHibernate.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate" Source="NHibernate\NHibernate.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.DomainModel" Source="NHibernate.DomainModel\NHibernate.DomainModel.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.Test" Source="NHibernate.Test\NHibernate.Test.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.LinFu" Source="NHibernate.ByteCode.LinFu\NHibernate.ByteCode.LinFu.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.LinFu.Tests" Source="NHibernate.ByteCode.LinFu.Tests\App.config" Description="File converted successfully. All &lt;supportedRuntime&gt; and &lt;requiredRuntime&gt; tags were removed to enable the project to build and run with Visual Studio 2005.">
+</Event><Event ErrorLevel="3" Project="NHibernate.ByteCode.LinFu.Tests" Source="NHibernate.ByteCode.LinFu.Tests\App.config" Description="Converted">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.Castle" Source="NHibernate.ByteCode.Castle\NHibernate.ByteCode.Castle.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.ByteCode.Castle.Tests" Source="NHibernate.ByteCode.Castle.Tests\NHibernate.ByteCode.Castle.Tests.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="NHibernate.TestDatabaseSetup" Source="NHibernate.TestDatabaseSetup\NHibernate.TestDatabaseSetup.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>
