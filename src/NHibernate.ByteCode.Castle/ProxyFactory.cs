@@ -66,8 +66,11 @@ namespace NHibernate.ByteCode.Castle
 			{
 				var initializer = new LazyInitializer(EntityName, PersistentClass, id, GetIdentifierMethod,
 				                                            SetIdentifierMethod, ComponentIdType, session);
-                var interceptors = new List<DP.IInterceptor>(new DP.IInterceptor[] { initializer });
+                var interceptors = new List<DP.IInterceptor>();
                 var opts = LazyInitAllExtras(interceptors);
+                interceptors.Add(initializer);  // IMPORTANT: this must com last because they don't call invocation.Proceed().
+                                                // Because of this flaw, none of the interceptors that come after this one will
+                                                // be invoked.
                 var interceptorArray = interceptors.ToArray();
 				object generatedProxy;
                 if (IsClassProxy) {
@@ -125,12 +128,12 @@ namespace NHibernate.ByteCode.Castle
 
 		public override object GetFieldInterceptionProxy()
 		{
-			var proxyGenerationOptions = new ProxyGenerationOptions();
+            var proxyGenerationOptions = new ProxyGenerationOptions();
+            var interceptor = new LazyFieldInterceptor();
             var interceptors = new List<DP.IInterceptor>();
-			interceptors.Add(new LazyFieldInterceptor());
-            proxyGenerationOptions.AddMixinInstance(interceptors[0]);
             // Add all extra interceptors
             interceptors.AddRange(GetExtras(s_interceptors));
+            interceptors.Add(interceptor);
             // Add all extra mixins
             foreach (var mixin in GetExtras(s_mixins))
                 proxyGenerationOptions.AddMixinInstance(mixin);
