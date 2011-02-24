@@ -20,16 +20,10 @@ namespace NHibernate.ByteCode.Castle
         private static List<Func<System.Type, IEnumerable<DP.IInterceptor>>> s_interceptors = new List<Func<System.Type, IEnumerable<DP.IInterceptor>>>();
         private DP.IInterceptor[] allInterceptors = null;
         private static List<Func<System.Type, IEnumerable<object>>> s_mixins = new List<Func<System.Type, IEnumerable<object>>>();
-        private static List<Func<System.Type, IEnumerable<System.Type>>> s_interfaces = new List<Func<System.Type, IEnumerable<System.Type>>>();
 
         public static void AddInterceptors(Func<System.Type, IEnumerable<DP.IInterceptor>> interceptors)
         {
             s_interceptors.Add(interceptors);
-        }
-
-        public static void AddAdditionalInterfaces(Func<System.Type, IEnumerable<System.Type>> interfaces)
-        {
-            s_interfaces.Add(interfaces);
         }
 
         public static void AddMixins(Func<System.Type, IEnumerable<object>> mixins)
@@ -37,21 +31,26 @@ namespace NHibernate.ByteCode.Castle
             s_mixins.Add(mixins);
         }
 
-        private IEnumerable<T> GetExtras<T>(IEnumerable<Func<System.Type, IEnumerable<T>>> creators)
+        private static IEnumerable<T> GetExtras<T>(IEnumerable<Func<System.Type, IEnumerable<T>>> creators, System.Type onType)
         {
             foreach (var item in creators)
-                foreach (var i in item(PersistentClass))
+                foreach (var i in item(onType))
                     yield return i;
         }
 
-        private ProxyGenerationOptions LazyInitAllExtras(List<DP.IInterceptor> interceptors, List<System.Type> interfaces)
+        private IEnumerable<T> GetExtras<T>(IEnumerable<Func<System.Type, IEnumerable<T>>> creators)
+        {
+            return GetExtras(creators, PersistentClass);
+        }
+
+        private ProxyGenerationOptions LazyInitAllExtras(List<DP.IInterceptor> interceptors)
         {
             interceptors.AddRange(GetExtras(s_interceptors));
-            interfaces.AddRange(GetExtras(s_interfaces));
             var opts = new ProxyGenerationOptions();
             
             foreach (var mixin in GetExtras(s_mixins))
                 opts.AddMixinInstance(mixin);
+            opts.Hook = new MixinProxyGenerationHook();
             return opts;
         }
 
@@ -68,10 +67,7 @@ namespace NHibernate.ByteCode.Castle
 				var initializer = new LazyInitializer(EntityName, PersistentClass, id, GetIdentifierMethod,
 				                                            SetIdentifierMethod, ComponentIdType, session);
                 var interceptors = new List<DP.IInterceptor>(new DP.IInterceptor[] { initializer });
-                var interfaces = new List<System.Type>();
-                var opts = LazyInitAllExtras(interceptors, interfaces);
-                opts.Hook = new MixinProxyGenerationHook(this);
-                interfaces.AddRange(Interfaces);
+                var opts = LazyInitAllExtras(interceptors);
                 var interceptorArray = interceptors.ToArray();
 				object generatedProxy;
                 if (IsClassProxy) {
@@ -80,7 +76,6 @@ namespace NHibernate.ByteCode.Castle
                 }
                 else generatedProxy = ProxyGenerator.CreateInterfaceProxyWithoutTarget(Interfaces[0], Interfaces, opts, interceptorArray);
 
-                var changes = ((INHibernateProxy)generatedProxy).HibernateLazyInitializer;
 				initializer._constructed = true;
 				return (INHibernateProxy) generatedProxy;
 			}
@@ -91,52 +86,57 @@ namespace NHibernate.ByteCode.Castle
 			}
 		}
 
-        public class MixinProxyGenerationHook : IProxyGenerationHook
+        private class MixinProxyGenerationHook : IProxyGenerationHook
         {
-            private ProxyFactory factory;
-            public MixinProxyGenerationHook(ProxyFactory factory)
-            {
-                this.factory = factory;
-            }
-
             #region IProxyGenerationHook Members
 
             public void MethodsInspected(){}
 
             public void NonProxyableMemberNotification(System.Type type, System.Reflection.MemberInfo memberInfo){}
 
+            private HashSet<System.Reflection.MethodInfo> nonProxiedMethods;
+
             public bool ShouldInterceptMethod(System.Type type, System.Reflection.MethodInfo methodInfo)
             {
-                foreach (var obj in factory.GetExtras(ProxyFactory.s_mixins))
+                if (nonProxiedMethods == null)
                 {
-                    foreach (var @interface in obj.GetType().GetInterfaces())
-                    {
-                        var @params = new System.Type[methodInfo.GetParameters().Length];
-                        for(int i=0; i<@params.Length; i++)
-                            @params[i] = methodInfo.GetParameters()[i].ParameterType;
-                        var meth = @interface.GetMethod(methodInfo.Name, @params);
-                        if (meth != null)
-                            return false;
-                    }
+                    nonProxiedMethods = new HashSet<System.Reflection.MethodInfo>();
+                    foreach (var obj in ProxyFactory.GetExtras(ProxyFactory.s_mixins, type))
+                        foreach (var @interface in obj.GetType().GetInterfaces())
+                            foreach (var method in @interface.GetMethods())
+                                nonProxiedMethods.Add(method);
                 }
-                return true;
+                return !nonProxiedMethods.Contains(methodInfo);
             }
 
             #endregion
         }
 
+        /// <summary>
+        /// This is our own static proxy to make sure the dynamic proxy still has a reference to an
+        /// ILazyInitializer and implements INhibernateProxy. We have to use this with the DP as a 
+        /// mixin. NH used to just include INHibernateProxy as an additional interface that needed
+        /// to be implemented. I think I like this better...
+        /// </summary>
         public class NHibernateProxyMixin : INHibernateProxy
         {
             public ILazyInitializer HibernateLazyInitializer { get; set; }
-            
         }
 
 		public override object GetFieldInterceptionProxy()
 		{
 			var proxyGenerationOptions = new ProxyGenerationOptions();
-			var interceptor = new LazyFieldInterceptor();
-			proxyGenerationOptions.AddMixinInstance(interceptor);
-			return ProxyGenerator.CreateClassProxy(PersistentClass, proxyGenerationOptions, interceptor);
+            var interceptors = new List<DP.IInterceptor>();
+			interceptors.Add(new LazyFieldInterceptor());
+            proxyGenerationOptions.AddMixinInstance(interceptors[0]);
+            // Add all extra interceptors
+            interceptors.AddRange(GetExtras(s_interceptors));
+            // Add all extra mixins
+            foreach (var mixin in GetExtras(s_mixins))
+                proxyGenerationOptions.AddMixinInstance(mixin);
+            // important line to make sure NH doesn't intercept our mixins...
+            proxyGenerationOptions.Hook = new MixinProxyGenerationHook();
+			return ProxyGenerator.CreateClassProxy(PersistentClass, proxyGenerationOptions, interceptors.ToArray());
 		}
 	}
 }
