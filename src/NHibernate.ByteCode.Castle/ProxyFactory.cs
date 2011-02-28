@@ -80,6 +80,9 @@ namespace NHibernate.ByteCode.Castle
                 else generatedProxy = ProxyGenerator.CreateInterfaceProxyWithoutTarget(Interfaces[0], Interfaces, opts, interceptorArray);
 
 				initializer._constructed = true;
+                var mixinInitializer = generatedProxy as IEntityMixin;
+                if (mixinInitializer != null && !mixinInitializer.NHibernateMixin_IsInitialized)
+                    mixinInitializer.NHibernateMixin_Initialize(generatedProxy);
 				return (INHibernateProxy) generatedProxy;
 			}
 			catch (Exception e)
